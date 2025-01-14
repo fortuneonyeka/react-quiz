@@ -11,7 +11,8 @@ const initialState = {
 
   // loading,error,ready,active,completed
   status: "loading",
-  index: 0
+  index: 0,
+  answer: null,
 };
 const reducer = (state, action) => {
   switch (action.type) {
@@ -32,17 +33,25 @@ const reducer = (state, action) => {
     return {
       ...state,
       status: "active"
-    }
+    };
+
+    case "newAnswer":
+      return {
+        ...state,
+        answer: action.payload,
+        // index: state.index + 1
+      }
+
 
     default:
       throw new Error("Unknown action");
   }
 };
 function App() {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [{questions, status,index, answer}, dispatch] = useReducer(reducer, initialState);
   // {questions, status,index}
 
-  const numQuestions = state.questions.length;
+  const numQuestions = questions.length;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,10 +76,10 @@ function App() {
       <Header />
 
       <Main>
-        {state.status === "loading" && <Loader />}
-        {state.status === "error" && <Error />}
-        {state.status === "ready" && <StartScreen numQuestions={numQuestions} dispatch={dispatch}/>}
-        {state.status === "active" && <Question questions={state.questions[state.index]}/>}
+        {status === "loading" && <Loader />}
+        {status === "error" && <Error />}
+        {status === "ready" && <StartScreen numQuestions={numQuestions} dispatch={dispatch}/>}
+        {status === "active" && <Question questions={questions[index]} dispatch={dispatch} answer={answer}/>}
       </Main>
     </div>
   );
