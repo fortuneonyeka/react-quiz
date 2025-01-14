@@ -5,6 +5,7 @@ import Loader from "./components/Loader";
 import Error from "./components/Error";
 import Question from "./components/Question";
 import StartScreen from "./components/StartScreen";
+import NextButton from "./components/NextButton";
 
 const initialState = {
   questions: [],
@@ -13,7 +14,8 @@ const initialState = {
   status: "loading",
   index: 0,
   answer: null,
-  points:0,
+  points: 0,
+  answers: {}, // Store answers for each question
 };
 const reducer = (state, action) => {
   switch (action.type) {
@@ -31,28 +33,57 @@ const reducer = (state, action) => {
       };
 
     case "start":
-    return {
-      ...state,
-      status: "active"
-    };
+      return {
+        ...state,
+        status: "active",
+        index: 0, // Reset to the first question
+        answer: null, // Clear any previous answers
+        points: 0, // Reset points
+        answers: {}, // Clear stored answers
+      };
 
     case "newAnswer":
       const question = state.questions.at(state.index);
       return {
         ...state,
         answer: action.payload,
-        points: action.payload === question.correctOption ? state.points + question.points : state.points
-        // index: state.index + 1
-      }
+        points:
+          action.payload === question.correctOption
+            ? state.points + question.points
+            : state.points,
+        answers: {
+          ...state.answers,
+          [state.index]: action.payload, // Store the answer for the current question
+        },
+      };
 
+    case "nextQuestion":
+      // Make sure index doesn't exceed the last question and reset answer
+      return {
+        ...state,
+        index: Math.min(state.index + 1, state.questions.length - 1),
+        answer: state.answers[state.index + 1] ?? null, // Load the stored answer for the next question, if any
+      };
+
+    case "prevQuestion":
+      // Make sure index doesn't go below the first question
+      return {
+        ...state,
+        index: Math.max(state.index - 1, 0),
+        answer: state.answers[state.index - 1] ?? null, // Load the stored answer for the previous question, if any
+      };
 
     default:
       throw new Error("Unknown action");
   }
 };
+
 function App() {
-  const [{questions, status,index, answer,points}, dispatch] = useReducer(reducer, initialState);
-  // {questions, status,index}
+  const [{ questions, status, index, answer }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
+  // {questions, status, index}
 
   const numQuestions = questions.length;
 
@@ -64,7 +95,6 @@ function App() {
 
         const data = await res.json();
 
-       
         dispatch({ type: "dataReceived", payload: data });
       } catch (error) {
         dispatch({ type: "dataFailed" });
@@ -81,8 +111,49 @@ function App() {
       <Main>
         {status === "loading" && <Loader />}
         {status === "error" && <Error />}
-        {status === "ready" && <StartScreen numQuestions={numQuestions} dispatch={dispatch}/>}
-        {status === "active" && <Question questions={questions[index]} dispatch={dispatch} answer={answer}/>}
+        {status === "ready" && (
+          <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
+        )}
+        {status === "active" && (
+          <>
+            {questions[index] ? (
+              <Question
+                questions={questions[index]}
+                dispatch={dispatch}
+                answer={answer}
+              />
+            ) : (
+              <NextButton
+                
+                text="Restart"
+                className="btn"
+                onClick={() => dispatch({ type: "start" })}
+              />
+            )}
+
+            {questions[index] && (
+              <>
+                <NextButton
+                  
+                  text="Next"
+                  className="btn btn-ui"
+                  onClick={() => dispatch({ type: "nextQuestion" })}
+                  disable={answer === null} // Disable if no answer is provided
+                />
+
+                {/* Prev Button */}
+                {index > 0 && (
+                  <NextButton
+                   
+                    text="Prev"
+                    className="btn"
+                    onClick={() => dispatch({ type: "prevQuestion" })}
+                  />
+                )}
+              </>
+            )}
+          </>
+        )}
       </Main>
     </div>
   );
