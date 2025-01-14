@@ -13,6 +13,7 @@ const initialState = {
   status: "loading",
   index: 0,
   answer: null,
+  points:0,
 };
 const reducer = (state, action) => {
   switch (action.type) {
@@ -36,9 +37,11 @@ const reducer = (state, action) => {
     };
 
     case "newAnswer":
+      const question = state.questions.at(state.index);
       return {
         ...state,
         answer: action.payload,
+        points: action.payload === question.correctOption ? state.points + question.points : state.points
         // index: state.index + 1
       }
 
@@ -48,7 +51,7 @@ const reducer = (state, action) => {
   }
 };
 function App() {
-  const [{questions, status,index, answer}, dispatch] = useReducer(reducer, initialState);
+  const [{questions, status,index, answer,points}, dispatch] = useReducer(reducer, initialState);
   // {questions, status,index}
 
   const numQuestions = questions.length;
