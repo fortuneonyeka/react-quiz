@@ -6,6 +6,7 @@ import Error from "./components/Error";
 import Question from "./components/Question";
 import StartScreen from "./components/StartScreen";
 import NextButton from "./components/NextButton";
+import Progress from "./components/Progress";
 
 const initialState = {
   questions: [],
@@ -61,7 +62,7 @@ const reducer = (state, action) => {
       // Make sure index doesn't exceed the last question and reset answer
       return {
         ...state,
-        index: Math.min(state.index + 1, state.questions.length - 1),
+        index: Math.min(state.index + 1),
         answer: state.answers[state.index + 1] ?? null, // Load the stored answer for the next question, if any
       };
 
@@ -79,13 +80,15 @@ const reducer = (state, action) => {
 };
 
 function App() {
-  const [{ questions, status, index, answer }, dispatch] = useReducer(
+  const [{ questions, status, index, answer,points }, dispatch] = useReducer(
     reducer,
     initialState
   );
   // {questions, status, index}
 
   const numQuestions = questions.length;
+  const totalPossiblePoints = questions.reduce((prev, curr) => prev + curr.points, 0)
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,6 +119,7 @@ function App() {
         )}
         {status === "active" && (
           <>
+          <Progress index={index} numQuestions={numQuestions} points={points} totalPossiblePoints={totalPossiblePoints} answer={answer}/>
             {questions[index] ? (
               <Question
                 questions={questions[index]}
@@ -126,7 +130,7 @@ function App() {
               <NextButton
                 
                 text="Restart"
-                className="btn"
+                className="btn btn-ui"
                 onClick={() => dispatch({ type: "start" })}
               />
             )}
