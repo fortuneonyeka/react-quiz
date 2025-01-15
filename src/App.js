@@ -81,6 +81,12 @@ const reducer = (state, action) => {
         highscore: state.points > state.highscore ? state.points: state.highscore
       };
 
+      case "reStart":
+        return {
+          ...initialState,questions:state.questions,
+          status: "ready"
+        }
+
     default:
       throw new Error("Unknown action");
   }

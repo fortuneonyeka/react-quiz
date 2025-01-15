@@ -3,6 +3,7 @@ import NextButton from "./NextButton";
 
 const FinishedScreen = ({ points, totalPossiblePoints, dispatch, highscore }) => {
   const percentage = (points / totalPossiblePoints) * 100;
+  const roundedPercentage = Math.ceil(percentage)
  let emoji;
 
  if(percentage === 100) emoji = "🥇"
@@ -14,7 +15,7 @@ const FinishedScreen = ({ points, totalPossiblePoints, dispatch, highscore }) =>
     <>
       <p className="result">
        <span>{emoji}</span> You scored <strong>{points}</strong> out of {totalPossiblePoints} (
-        {Math.ceil(percentage)}%)
+        {roundedPercentage}%)
       </p>
 
       <p className="highscore">(Highscore: {highscore} points)</p>
@@ -22,7 +23,7 @@ const FinishedScreen = ({ points, totalPossiblePoints, dispatch, highscore }) =>
        <NextButton
         text="Restart Quiz"
         className="btn btn-ui"
-        onClick={() => dispatch({ type: "start" })}
+        onClick={() => dispatch({ type: "reStart" })}
       />
     </>
   );
