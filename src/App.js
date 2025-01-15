@@ -7,6 +7,7 @@ import Question from "./components/Question";
 import StartScreen from "./components/StartScreen";
 import NextButton from "./components/NextButton";
 import Progress from "./components/Progress";
+import FinishedScreen from "./components/FinishedScreen";
 
 const initialState = {
   questions: [],
@@ -17,6 +18,7 @@ const initialState = {
   answer: null,
   points: 0,
   answers: {}, // Store answers for each question
+  highscore: 0
 };
 const reducer = (state, action) => {
   switch (action.type) {
@@ -37,14 +39,14 @@ const reducer = (state, action) => {
       return {
         ...state,
         status: "active",
-        index: 0, // Reset to the first question
-        answer: null, // Clear any previous answers
-        points: 0, // Reset points
-        answers: {}, // Clear stored answers
+        index: 0,
+        answer: null,
+        points: 0,
+        answers: {},
       };
 
     case "newAnswer":
-      const question = state.questions.at(state.index);
+      const question = state.questions[state.index];
       return {
         ...state,
         answer: action.payload,
@@ -54,24 +56,29 @@ const reducer = (state, action) => {
             : state.points,
         answers: {
           ...state.answers,
-          [state.index]: action.payload, // Store the answer for the current question
+          [state.index]: action.payload,
         },
       };
 
     case "nextQuestion":
-      // Make sure index doesn't exceed the last question and reset answer
       return {
         ...state,
-        index: Math.min(state.index + 1),
-        answer: state.answers[state.index + 1] ?? null, // Load the stored answer for the next question, if any
+        index: Math.min(state.index + 1, state.questions.length - 1),
+        answer: state.answers[state.index + 1] ?? null,
       };
 
     case "prevQuestion":
-      // Make sure index doesn't go below the first question
       return {
         ...state,
         index: Math.max(state.index - 1, 0),
-        answer: state.answers[state.index - 1] ?? null, // Load the stored answer for the previous question, if any
+        answer: state.answers[state.index - 1] ?? null,
+      };
+
+    case "finish":
+      return {
+        ...state,
+        status: "finished",
+        highscore: state.points > state.highscore ? state.points: state.highscore
       };
 
     default:
@@ -80,15 +87,16 @@ const reducer = (state, action) => {
 };
 
 function App() {
-  const [{ questions, status, index, answer,points }, dispatch] = useReducer(
+  const [{ questions, status, index, answer, points, highscore }, dispatch] = useReducer(
     reducer,
     initialState
   );
-  // {questions, status, index}
 
-  const numQuestions = questions.length;
-  const totalPossiblePoints = questions.reduce((prev, curr) => prev + curr.points, 0)
-  
+  const numQuestions = questions.length; // This should be 15
+  const totalPossiblePoints = questions.reduce(
+    (prev, curr) => prev + curr.points,
+    0
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,36 +127,44 @@ function App() {
         )}
         {status === "active" && (
           <>
-          <Progress index={index} numQuestions={numQuestions} points={points} totalPossiblePoints={totalPossiblePoints} answer={answer}/>
-            {questions[index] ? (
+            <Progress
+              index={index}
+              numQuestions={numQuestions}
+              points={points}
+              totalPossiblePoints={totalPossiblePoints}
+              answer={answer}
+            />
+            {questions[index] && (
               <Question
                 questions={questions[index]}
                 dispatch={dispatch}
                 answer={answer}
               />
-            ) : (
-              <NextButton
-                
-                text="Restart"
-                className="btn btn-ui"
-                onClick={() => dispatch({ type: "start" })}
-              />
             )}
 
             {questions[index] && (
               <>
-                <NextButton
-                  
-                  text="Next"
-                  className="btn btn-ui"
-                  onClick={() => dispatch({ type: "nextQuestion" })}
-                  disable={answer === null} // Disable if no answer is provided
-                />
+                {/* Conditionally render "Next" or "Finish" button */}
+                {index === numQuestions - 1 && answer !== null ? (
+                  <NextButton
+                    text="Finish"
+                    className="btn btn-ui"
+                    onClick={() => dispatch({ type: "finish" })}
+                  />
+                ) : (
+                  index < numQuestions - 1 && (
+                    <NextButton
+                      text="Next"
+                      className="btn btn-ui"
+                      onClick={() => dispatch({ type: "nextQuestion" })}
+                      disabled={answer === null}
+                    />
+                  )
+                )}
 
                 {/* Prev Button */}
                 {index > 0 && (
                   <NextButton
-                   
                     text="Prev"
                     className="btn"
                     onClick={() => dispatch({ type: "prevQuestion" })}
@@ -157,6 +173,14 @@ function App() {
               </>
             )}
           </>
+        )}
+        {status === "finished" && (
+          <FinishedScreen
+            points={points}
+            totalPossiblePoints={totalPossiblePoints}
+            dispatch={dispatch}
+            highscore={highscore}
+          />
         )}
       </Main>
     </div>
