@@ -1,15 +1,17 @@
-import React from 'react'
+import React from "react";
 
-const StartScreen = ({numQuestions, dispatch}) => {
+const StartScreen = ({ numQuestions, dispatch }) => {
   return (
-    <div className='start'>
+    <div className="start">
       <h2>Welcome To The React Quiz</h2>
       <h3>{numQuestions} questions to test your React Mastery</h3>
-      <button className="btn btn-ui" onClick={() =>dispatch({type: "start"})}>
+      <button
+        className="btn btn-ui"
+        onClick={() => dispatch({ type: "start" })}>
         Let's go!
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default StartScreen
+export default StartScreen;

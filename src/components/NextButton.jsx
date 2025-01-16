@@ -3,8 +3,7 @@ function NextButton({ text, className, onClick, disabled = false }) {
     <button
       className={`${className} ${disabled ? "disabled" : ""}`}
       onClick={onClick}
-      disabled={disabled} // This ensures the button is disabled
-    >
+      disabled={disabled}>
       {text}
     </button>
   );
