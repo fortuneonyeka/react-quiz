@@ -213,6 +213,7 @@ progress {
   border: 2px solid var(--color-dark);
   padding: 1.35rem 2.8rem;
   border-radius: 100px;
+  margin-top: 20px;
 }
 
 /* CREDIT: https://dev.to/afif/i-made-100-css-loaders-for-your-next-project-4eje */

@@ -8,6 +8,10 @@ import StartScreen from "./components/StartScreen";
 import NextButton from "./components/NextButton";
 import Progress from "./components/Progress";
 import FinishedScreen from "./components/FinishedScreen";
+import Footer from "./components/Footer";
+import Timer from "./components/Timer";
+
+const SECONDS_PER_QUESTION = 20
 
 const initialState = {
   questions: [],
@@ -18,7 +22,8 @@ const initialState = {
   answer: null,
   points: 0,
   answers: {}, // Store answers for each question
-  highscore: 0
+  highscore: 0,
+  secondsRemaining: null
 };
 const reducer = (state, action) => {
   switch (action.type) {
@@ -39,10 +44,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         status: "active",
-        index: 0,
-        answer: null,
-        points: 0,
-        answers: {},
+        secondsRemaining: state.questions.length * SECONDS_PER_QUESTION 
       };
 
     case "newAnswer":
@@ -87,13 +89,20 @@ const reducer = (state, action) => {
           status: "ready"
         }
 
+        case "timer":
+          return {
+            ...state,
+          secondsRemaining: state.secondsRemaining - 1,
+          status: state.secondsRemaining === 0 ? "finished" : state.status,
+          }
+
     default:
       throw new Error("Unknown action");
   }
 };
 
 function App() {
-  const [{ questions, status, index, answer, points, highscore }, dispatch] = useReducer(
+  const [{ questions, status, index, answer, points, highscore , secondsRemaining}, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -176,6 +185,9 @@ function App() {
                     onClick={() => dispatch({ type: "prevQuestion" })}
                   />
                 )}
+                <Footer>
+                  <Timer  dispatch={dispatch} secondsRemaining={secondsRemaining}/>
+                </Footer>
               </>
             )}
           </>

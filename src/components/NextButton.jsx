@@ -1,10 +1,13 @@
-import React from 'react'
-
-const NextButton = ({text, className, onClick, disable, numQuestion, index}) => {
-  
- return (
-   <button className={className} disabled={disable} onClick={onClick}>{text}</button>
-  )
+function NextButton({ text, className, onClick, disabled = false }) {
+  return (
+    <button
+      className={`${className} ${disabled ? "disabled" : ""}`}
+      onClick={onClick}
+      disabled={disabled} // This ensures the button is disabled
+    >
+      {text}
+    </button>
+  );
 }
 
-export default NextButton
+export default NextButton;
