@@ -85,6 +85,7 @@ git@github.com:fortuneonyeka/react-quiz.git
 ```sh
 cd react-quiz
 npm install
+npm run server : start the json server
 npm start
 ```
 
