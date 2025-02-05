@@ -1,7 +1,9 @@
 import React from "react";
 import NextButton from "./NextButton";
+import { useQuiz } from "../context/QuizContext";
 
-const FinishedScreen = ({ points, totalPossiblePoints, dispatch, highscore }) => {
+const FinishedScreen = () => {
+  const { points, totalPossiblePoints, dispatch, highscore } = useQuiz()
   const percentage = (points / totalPossiblePoints) * 100;
   const roundedPercentage = Math.ceil(percentage)
  let emoji;
