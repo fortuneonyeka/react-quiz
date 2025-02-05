@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { initialState, reducer } from "../reducer";
 
-const QuizContext = createContext()
+const QuizContext = createContext();
 
-const QuizContextProvider = ({children}) => {
+const QuizContextProvider = ({ children }) => {
   const [
     { questions, status, index, answer, points, highscore, secondsRemaining },
     dispatch,
@@ -32,19 +32,31 @@ const QuizContextProvider = ({children}) => {
     fetchData();
   }, []);
 
-  return(
-    <QuizContext.Provider value={{questions,status,index,answer,points,highscore,secondsRemaining,numQuestions,totalPossiblePoints,dispatch}}>
+  return (
+    <QuizContext.Provider
+      value={{
+        questions,
+        status,
+        index,
+        answer,
+        points,
+        highscore,
+        secondsRemaining,
+        numQuestions,
+        totalPossiblePoints,
+        dispatch,
+      }}>
       {children}
     </QuizContext.Provider>
-  )
-}
+  );
+};
 
 const useQuiz = () => {
-  const context = useContext(QuizContext)
+  const context = useContext(QuizContext);
   if (context === undefined) {
-    throw new Error("QuizContext must be used inside QuizContextProvider")
+    throw new Error("QuizContext must be used inside QuizContextProvider");
   }
-  return context
-}
+  return context;
+};
 
-export {QuizContextProvider,useQuiz}
+export { QuizContextProvider, useQuiz };
